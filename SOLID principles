@@ -1,0 +1,13 @@
+I will have the following code 
+models
+base_todo_service
+standard_todo_service
+soft_delete_todo_service
+dependencies
+todo_api
+
+
+Implementations 
+1.Added solid priciples
+2.Added abstract classes 
+3.Naming conventions are fixed 
