@@ -1,10 +1,11 @@
-from base_to_do_service import BaseTodoService
 from standard_todo_service import StandardTodoService
-# from services.soft_delete_todo_service import SoftDeleteTodoService
+from soft_todo_delete import SoftDeleteTodoService
+from base_to_do_service import BaseTodoService
 
 
-def get_todo_service() -> BaseTodoService:
+def get_standard_todo_service() -> BaseTodoService:
     return StandardTodoService()
 
-    # For another client simply change to:
-    # return SoftDeleteTodoService()
+
+def get_soft_delete_todo_service() -> BaseTodoService:
+    return SoftDeleteTodoService()
