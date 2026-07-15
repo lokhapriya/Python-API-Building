@@ -1,6 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 
-from .standard_todo_service import StandardTodoService
+from standard_todo_service import StandardTodoService
 
 
 class SoftDeleteTodoService(StandardTodoService):
@@ -20,6 +21,8 @@ class SoftDeleteTodoService(StandardTodoService):
 
     def get_lists(self):
 
+        self.purge_deleted_lists()
+
         return [
             todo
             for todo in self.todo_lists
@@ -34,7 +37,7 @@ class SoftDeleteTodoService(StandardTodoService):
             todo
             for todo in self.todo_lists
             if not (
-                todo.get("is_deleted")
+                todo.get("is_deleted", False)
                 and current_time - todo["deleted_at"] >= timedelta(hours=4)
             )
         ]
