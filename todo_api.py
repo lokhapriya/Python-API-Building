@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from fastapi import HTTPException
 
-from dependencies import get_todo_service
 from models import TodoList
 from models import TodoListUpdate
 
+from dependencies import get_todo_service
+from todo_service_factory import TodoServiceFactory
+
 app = FastAPI()
 
-# Create the service once
+# Used for Create, Read and Update
 service = get_todo_service()
 
 
@@ -44,9 +46,14 @@ def update_list(
 
 
 @app.delete("/lists/{list_id}")
-def delete_list(list_id: int):
+def delete_list(
+    list_id: int,
+    strategy: str = "SOFT"
+):
 
-    deleted = service.delete_list(list_id)
+    delete_service = TodoServiceFactory.get_service(strategy)
+
+    deleted = delete_service.delete_list(list_id)
 
     if deleted is None:
         raise HTTPException(
