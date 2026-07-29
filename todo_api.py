@@ -6,11 +6,20 @@ from models import TodoListUpdate
 
 from standard_todo_service import StandardTodoService
 from soft_todo_delete import SoftDeleteTodoService
+from todo_service_factory import DeleteServiceFactory
+
 
 app = FastAPI()
 
-# Used for Create, Read and Update
-standard_service = StandardTodoService()
+# -----------------------------
+# Shared in-memory storage
+# -----------------------------
+
+shared_todo_lists = []
+
+factory = DeleteServiceFactory(shared_todo_lists)
+
+standard_service = factory.standard_service
 
 
 @app.post("/lists")
@@ -26,10 +35,7 @@ def get_lists():
 
 
 @app.put("/lists/{list_id}")
-def update_list(
-    list_id: int,
-    todo: TodoListUpdate
-):
+def update_list(list_id: int, todo: TodoListUpdate):
 
     updated = standard_service.update_list(
         list_id,
@@ -51,10 +57,7 @@ def delete_list(
     strategy: str = "STANDARD"
 ):
 
-    if strategy.upper() == "SOFT":
-        service = SoftDeleteTodoService()
-    else:
-        service = StandardTodoService()
+    service = factory.get_service(strategy)
 
     deleted = service.delete_list(list_id)
 
