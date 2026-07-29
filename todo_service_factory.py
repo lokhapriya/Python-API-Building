@@ -1,14 +1,17 @@
-from base_to_do_service import BaseTodoService
 from standard_todo_service import StandardTodoService
 from soft_todo_delete import SoftDeleteTodoService
 
 
-class TodoServiceFactory:
+class DeleteServiceFactory:
 
-    @staticmethod
-    def get_service(strategy: str) -> BaseTodoService:
+    def __init__(self, shared_todo_lists):
+
+        self.standard_service = StandardTodoService(shared_todo_lists)
+        self.soft_delete_service = SoftDeleteTodoService(shared_todo_lists)
+
+    def get_service(self, strategy: str):
 
         if strategy.upper() == "SOFT":
-            return SoftDeleteTodoService()
+            return self.soft_delete_service
 
-        return StandardTodoService()
+        return self.standard_service
