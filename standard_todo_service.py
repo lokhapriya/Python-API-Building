@@ -1,41 +1,82 @@
-from .base_to_do_service import BaseTodoService
+from base_to_do_service import BaseTodoService
+from db_connection import todo_collection
+from bson.objectid import ObjectId
 
 
 class StandardTodoService(BaseTodoService):
 
+    def __init__(self):
+        pass
+
+
     def create_list(self, data):
 
         todo = {
-            "id": self.next_id,
             "name": data["name"]
         }
 
-        self.todo_lists.append(todo)
-        self.next_id += 1
+        result = todo_collection.insert_one(todo)
+
+        todo["_id"] = str(result.inserted_id)
 
         return todo
 
+
     def get_lists(self):
-        return self.todo_lists
+
+        todos = list(todo_collection.find())
+
+        for todo in todos:
+            todo["_id"] = str(todo["_id"])
+
+        return todos
+
 
     def update_list(self, list_id, name):
 
-        for todo in self.todo_lists:
+        result = todo_collection.update_one(
+            {
+                "_id": ObjectId(list_id)
+            },
+            {
+                "$set": {
+                    "name": name
+                }
+            }
+        )
 
-            if todo["id"] == list_id:
 
-                if name is not None:
-                    todo["name"] = name
+        if result.modified_count == 1:
 
-                return todo
+            updated_todo = todo_collection.find_one(
+                {
+                    "_id": ObjectId(list_id)
+                }
+            )
+
+            updated_todo["_id"] = str(updated_todo["_id"])
+
+            return updated_todo
+
 
         return None
 
+
     def delete_list(self, list_id):
 
-        for index, todo in enumerate(self.todo_lists):
+        result = todo_collection.delete_one(
+            {
+                "_id": ObjectId(list_id)
+            }
+        )
 
-            if todo["id"] == list_id:
-                return self.todo_lists.pop(index)
+
+        if result.deleted_count == 1:
+
+            return {
+                "message": "Todo deleted successfully",
+                "id": list_id
+            }
+
 
         return None
